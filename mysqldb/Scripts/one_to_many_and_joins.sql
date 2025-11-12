@@ -37,3 +37,61 @@ SELECT * FROM orders
 WHERE customer_id = (SELECT id FROM customers WHERE last_name = 'George');
 
 -- To perform a (kinda useless) cross join
+
+-- First inner join
+SELECT * FROM customers
+JOIN orders ON orders.customer_id = customers.id;
+
+SELECT first_name, last_name, order_date, amount FROM customers
+JOIN orders ON orders.customer_id = customers.id;
+
+SELECT * FROM orders
+JOIN customers ON customers.id = orders.customer_id;
+
+SELECT first_name, last_name, SUM(amount) AS total FROM customers
+JOIN orders ON orders.customer_id = customers.id
+GROUP BY first_name, last_name
+ORDER BY total;
+-- in case we use here id, then we need to specify customers or orders id
+
+-- LEFT JOIN
+SELECT first_name, last_name, order_date, amount
+FROM customers
+LEFT JOIN orders
+ON orders.customer_id = customers.id;
+
+SELECT order_date, amount, first_name, last_name
+FROM orders
+LEFT JOIN customers
+ON orders.customer_id = customers.id;
+
+SELECT first_name, last_name, IFNULL(SUM(amount), 0) AS money_spent
+FROM customers
+LEFT JOIN orders
+ON customers.id = orders.customer_id
+GROUP BY first_name, last_name;
+
+-- RIGHT JOIN
+SELECT first_name, last_name, order_date, amount
+FROM customers
+RIGHT JOIN orders
+ON customers.id = orders.customer_id;
+
+DROP TABLE orders;
+DROP TABLE customers;
+-- ON DELETE CASCADE
+CREATE TABLE customers (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	first_name VARCHAR(50),
+	last_name VARCHAR(50),
+	email VARCHAR(50)
+);
+
+CREATE TABLE orders (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	order_date DATE, 
+	amount DECIMAL (8, 2),
+	customer_id INT,
+	FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
+	
+);
